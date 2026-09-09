@@ -1,0 +1,6 @@
+# Dependencies imported by the original project script.
+torch
+torchvision
+Pillow
+numpy
+matplotlib
