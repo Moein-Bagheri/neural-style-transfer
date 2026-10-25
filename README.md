@@ -1,33 +1,29 @@
-# Neural Style Transfer
+# Neural style transfer
 
-An image stylization project using **VGG19 features and PyTorch**. It combines the structure of a content image with the visual style of a reference image through iterative optimization, then exports the result and an analysis figure.
+**What would this poster look like as a Bauhaus piece, or in Art Deco gold?** Style transfer on VGG19 features keeps a design's layout and headline type, and repaints it in the colors and textures of a style reference.
 
-**Python · PyTorch · torchvision · Pillow · NumPy · Matplotlib**
+| Content | Style | Result |
+| :---: | :---: | :---: |
+| <img src="input/BRUTALISM.jpg" width="190" alt="A graphic-design poster about brutalism"> | <img src="styles/BAUHAUS.jpg" width="190" alt="Bauhaus pattern in red, yellow, blue and black"> | <img src="output/professional_BRUTALISM_BAUHAUS_1753043197.jpg" width="230" alt="The poster repainted in Bauhaus colors"> |
+| | <img src="styles/LUXURY.jpg" width="190" alt="Art Deco illustration in gold and teal"> | <img src="output/professional_BRUTALISM_LUXURY_1753048282.jpg" width="230" alt="The poster repainted in gold and teal"> |
 
-## Saved examples
+*PyTorch · torchvision · VGG19 · L-BFGS*
 
-The original project includes an architectural content image and Bauhaus, Flat, Japanese and Luxury style references. These two results are retained from the completed runs:
+## What I did
 
-| Content | Bauhaus result | Luxury result |
-| --- | --- | --- |
-| ![Content image](input/BRUTALISM.jpg) | ![Bauhaus result](output/professional_BRUTALISM_BAUHAUS_1753043197.jpg) | ![Luxury result](output/professional_BRUTALISM_LUXURY_1753048282.jpg) |
+- Built the transfer on frozen VGG19 features: content from conv4_2 and conv5_1, style from the Gram matrices of five layers, weighted from fine to coarse (1.0 for conv1_1 down to 0.2 for conv5_1).
+- Started from the content image with a little noise, so the layout is there from the first step.
+- Optimized with L-BFGS in three stages, raising the style weight each time: coarse (200 steps, style weight 5,000), refine (300 steps, 10,000) and polish (200 steps, 15,000).
+- Added a smoothness (total variation) term against noise, and wrote color-coherence and perceptual losses as optional terms, switched off in the saved runs.
+- Saved each result with an analysis figure: content, style, result, before and after, and the loss curves.
 
-Open the analysis figures for the source/style/result comparison and optimization history:
+## What the results show
 
-- [Bauhaus analysis](output/professional_BRUTALISM_BAUHAUS_1753043197_analysis.png)
-- [Luxury analysis](output/professional_BRUTALISM_LUXURY_1753048282_analysis.png)
+- **Shapes and headline type survive; fine print doesn't.** "BRUTAL-ISM" stays readable in both results, while the web address at the bottom dissolves into texture.
+- **Each style needs its own weights.** There is no single setting that suits a flat geometric pattern and a detailed illustration alike.
+- **It's slow.** A run takes minutes on a GPU: fine for exploring design directions, not for real time.
 
-## Method
-
-- A pretrained VGG19 network provides intermediate image features.
-- Content and style objectives are combined with image regularization.
-- Optimization proceeds through multiple stages.
-- The interface offers 256 × 256 and 512 × 512 image sizes.
-- Final images and comparison plots are written to `output/`.
-
-## Run
-
-Open Windows PowerShell in this repository:
+## Try it
 
 ```powershell
 python -m venv .venv
@@ -35,7 +31,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe NeuralStyleTransfer.py
 ```
 
-At the prompts, enter:
+At the prompts, give a content image, a style image and a size (1 for 256 × 256, 2 for 512 × 512):
 
 ```text
 Content image path: input/BRUTALISM.jpg
@@ -43,15 +39,14 @@ Style image path: styles/BAUHAUS.jpg
 Choose (1-2): 2
 ```
 
-The program may download the pretrained VGG19 weights on first use. It chooses an available compute device through the original implementation. `requirements.txt` lists the imported libraries, without claiming a version-locked environment.
+The pretrained VGG19 weights download on first use. Results and analysis figures go to `output/`.
 
-## Repository layout
+## Layout
 
-| Path | Contents |
+| Path | What's there |
 | --- | --- |
-| [`NeuralStyleTransfer.py`](NeuralStyleTransfer.py) | Feature extraction, losses, optimization and interactive entry point |
-| [`input/`](input/) | Original content image |
-| [`styles/`](styles/) | Four original style reference images |
-| [`output/`](output/) | Two saved results and their analysis figures |
+| [`NeuralStyleTransfer.py`](NeuralStyleTransfer.py) | Feature extraction, losses, optimization and the interactive entry point |
+| [`styles/`](styles/) | Four style references: Bauhaus, flat, Japanese and luxury |
+| [`output/`](output/) | Two results and their analysis figures |
 
-Developed as university coursework in machine learning. The example images and generated results are retained from the project archive.
+Machine learning final project, University of Isfahan, 2025: one of my first deep learning projects.
